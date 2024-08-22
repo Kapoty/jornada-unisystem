@@ -1,5 +1,15 @@
+// update
+
+const { updateElectronApp, UpdateSourceType } = require('update-electron-app')
+updateElectronApp({
+  updateSource: {
+    type: UpdateSourceType.StaticStorage,
+    baseUrl: `https://unisystem.app.br/assets/jornada-unisystem/${process.platform}/${process.arch}/`
+  }
+})
+
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, Notification, dialog, ipcMain } = require('electron')
+const { app, BrowserWindow, Notification, dialog, ipcMain, Tray, Menu } = require('electron')
 const path = require('node:path')
 
 // run this as early in the main process as possible
@@ -8,9 +18,11 @@ if (require('electron-squirrel-startup')) app.quit();
 let mainWindow;
 let queryString = "";
 
+var iconpath = path.join(__dirname, 'icon.ico')
+
 const loadUrl = () => {
-	mainWindow.loadURL('https://192.168.100.4:8080/jornada' + queryString);
-	//mainWindow.loadURL('https://unisystem.app.br/jornada' + queryString);
+	//mainWindow.loadURL('https://192.168.100.4:8080/jornada' + queryString);
+	mainWindow.loadURL('https://unisystem.app.br/jornada' + queryString);
 }
 
 const createWindow = () => {
@@ -22,6 +34,7 @@ const createWindow = () => {
 		frame: false,
 		movable: false,
 		resizable: false,
+		skipTaskbar: true,
 		webPreferences: {
 			preload: path.join(__dirname, 'preload.js')
 		}
@@ -39,6 +52,20 @@ const createWindow = () => {
 	mainWindow.setIgnoreMouseEvents(true, { forward: true });
 
 	//mainWindow.webContents.openDevTools({mode: 'undocked'})
+
+	var appIcon = new Tray(iconpath)
+
+	var contextMenu = Menu.buildFromTemplate([
+		{
+			label: 'Fechar', click: function () {
+				app.quit()
+			}
+		}
+	])
+
+	appIcon.setTitle('Jornada-UniSystem')
+	appIcon.setToolTip('Jornada-UniSystem')
+	appIcon.setContextMenu(contextMenu)
 }
 
 ipcMain.on('quit', (event) => {
@@ -63,8 +90,10 @@ if (!gotTheLock) {
 	app.quit()
 } else {
 
-	if (process.argv.length > 1)
-		queryString = process.argv.pop().replace("jornada-unisystem://", "");
+	process.argv.forEach((arg) => {
+		if (arg.indexOf("jornada-unisystem://") >=0 )
+			queryString = arg.replace("jornada-unisystem://", "");
+	});
 
 	console.log(queryString);
 
@@ -75,7 +104,13 @@ if (!gotTheLock) {
 				mainWindow.focus()
 		}
 		// the commandLine is array of strings in which last element is deep link url
-		queryString = commandLine.pop().replace("jornada-unisystem://", "");
+		//queryString = commandLine.pop().replace("jornada-unisystem://", "");
+
+		commandLine.forEach((arg) => {
+			if (arg.indexOf("jornada-unisystem://") >=0 )
+				queryString = arg.replace("jornada-unisystem://", "");
+		});
+		
 		loadUrl();
 	})
 

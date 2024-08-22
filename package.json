@@ -1,6 +1,6 @@
 {
   "name": "jornada-unisystem",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "jornada-unisystem",
   "main": "main.js",
   "scripts": {
@@ -23,6 +23,7 @@
     "electron": "^31.0.2"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.1"
+    "electron-squirrel-startup": "^1.0.1",
+    "update-electron-app": "^3.0.0"
   }
 }
