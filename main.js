@@ -46,12 +46,22 @@ const createWindow = () => {
 
 	mainWindow.setContentProtection(true);
 
+	mainWindow.webContents.on('did-navigate-in-page', function (event, newUrl) {
+	    if (newUrl.indexOf("/jornada") < 0)
+	    	app.quit();
+	});
+
 	loadUrl();
 
 	mainWindow.setAlwaysOnTop(true, 'screen');
 	mainWindow.setIgnoreMouseEvents(true, { forward: true });
 
 	//mainWindow.webContents.openDevTools({mode: 'undocked'})
+
+	mainWindow.webContents.on('will-navigate', function (event, newUrl) {
+		//if (newUrl.contains("/jornada"))
+			app.quit();
+	});
 
 	var appIcon = new Tray(iconpath)
 
